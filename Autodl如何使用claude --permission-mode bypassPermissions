@@ -1,0 +1,30 @@
+1.创建一个名为 devuser 的普通用户：
+  useradd -m -s /bin/bash name
+2. 解决目录权限问题（关键！）：
+  chmod -R 777 目录
+3. 切换到这个普通用户：
+  su - name
+
+!!!能解决但root的好多权限无法使用。
+
+“挂着普通用户的身份，却拥有 root 的特权”来骗过 Claude Code 的安全检查，这在 Linux 系统中是完全可以做到的。
+
+给 devuser 赋予“免密 sudo（超级管理员）”权限。
+
+4.安装 sudo 工具：
+  apt-get update && apt-get install -y sudo
+
+5.配置 devuser 免密获取最高权限：
+  echo "devuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+6.把 root 的环境变量配置文件复制过来：
+  sudo cp /root/.bashrc /home/devuser/.bashrc
+
+7.把文件的所有权改回给你自己：
+  sudo chown devuser:devuser /home/devuser/.bashrc
+
+8.刷新环境，让它立刻生效
+  source ~/.bashrc
+
+
+9.claude --permission-mode bypassPermissions
