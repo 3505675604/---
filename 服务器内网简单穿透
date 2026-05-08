@@ -1,0 +1,38 @@
+第 1 步：下载 Cloudflare 穿透工具
+  curl -L --output cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+  chmod +x cloudflared
+
+第 2 步：启动穿透隧道
+  ./cloudflared tunnel --url http://127.0.0.1:8080
+
+
+升级：
+  nano start.sh
+
+#!/bin/bash
+
+# 检查是否在运行命令时直接带了端口号 (比如 ./start.sh 8080)
+PORT=$1
+
+# 如果没有带端口号，就弹出一个提示让用户手动输入
+if [ -z "$PORT" ]; then
+    read -p "请输入你需要穿透的端口号 (直接回车默认使用 7860): " PORT
+    # 如果用户直接按了回车，设置默认值为 7860
+    PORT=${PORT:-7860}
+fi
+
+echo "========================================"
+echo "正在启动内网穿透..."
+echo "目标本地端口: $PORT"
+echo "请等待几秒钟，正在生成公网网址..."
+echo "========================================"
+
+# 启动穿透，并将目标端口替换为变量 $PORT
+./cloudflared tunnel --url http://127.0.0.1:$PORT 2>&1 | grep -o 'https://[^ ]*\.trycloudflare\.com'
+
+echo ""
+echo "穿透已启动！(按 Ctrl + C 结束穿透)"
+
+
+./start.sh / ./start.sh 8080
+
